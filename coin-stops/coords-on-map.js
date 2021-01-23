@@ -66,9 +66,13 @@ function addMarker(map, spot) {
     });
     marker.addListener("click", () => {
         infowindow.open(map, marker);
+        event.stopPropagation();
     });
+    
+    return infowindow;
 }
 
+var infowindows = [];
 function initMap() {
     const response = window.getResponse();
     console.log('initMap got response: '+response);
@@ -84,7 +88,13 @@ function initMap() {
     for (var i=0; i<response.length; i++) {
         for (var j=0; j<response[i].nearby.length; j++) {
             console.log('adding marker ['+i+','+j+']: '+ response[i].nearby[j]);
-            addMarker(map, response[i].nearby[j]);
+            infowindows.push(addMarker(map, response[i].nearby[j]));
         }
     }
+    
+    map.addListener("click", () => {
+        for(var i=0; i<infowindows.length;i++) {
+            infowindows[i].close();
+        }
+    });
 }

@@ -1,11 +1,11 @@
 console.log('This is the coords-on-map.js file.');
 
 const icons = [
-    'https://dummyimage.com/40x40/ccc/ccc',
-    'https://dummyimage.com/40x40/0f0/0f0',
-    'https://dummyimage.com/40x40/ff0/ff0',
-    'https://dummyimage.com/40x40/fa0/fa0',
-    'https://dummyimage.com/40x40/f00/f00'
+    'https://jamisonderek.github.io/coin-stops/0-coins.png',
+    'https://jamisonderek.github.io/coin-stops/1-coins.png',
+    'https://jamisonderek.github.io/coin-stops/2-coins.png',
+    'https://jamisonderek.github.io/coin-stops/3-coins.png',
+    'https://jamisonderek.github.io/coin-stops/4-coins.png'
 ];
 
 // https://www.yelp.com/developers/display_requirements

@@ -50,7 +50,7 @@ function addMarker(map, spot) {
         <div>${transactions}</div>
 
             <p><a href="${spot.link}" onclick="console.log('Copying...'); var i=this.getElementsByTagName('input')[0]; i.select(); i.setSelectionRange(0, 1000); document.execCommand('copy'); console.log('Copied...'+i); return false;"><img src=
-            "https://s3-media2.fl.yelpcdn.com/assets/srv0/www_pages/95212dafe621/assets/img/brand_guidelines/yelp-2c.png" height="40px">Click to copy url.
+            "https://s3-media2.fl.yelpcdn.com/assets/srv0/www_pages/95212dafe621/assets/img/brand_guidelines/yelp-2c.png" height="40px">Click to copy url.<br/>
             <input type="text" value="${spot.link}" id="myInput" style="height:1px; width:150px;">
             </a>
     </div>

@@ -1,11 +1,11 @@
 console.log('This is the coords-on-map.js file.');
 
 const icons = [
-    'https://placekitten.com/40/40',
-    'https://placekitten.com/41/40',
-    'https://placekitten.com/40/41',
-    'https://placekitten.com/41/41',
-    'https://placekitten.com/41/41'
+    'https://www.fillmurray.com/40/40',
+    'https://baconmockup.com/40/40',
+    'https://placebeard.it/40/40',
+    'https://placebear.com/40/40',
+    'https://dummyimage.com/40x40/0f0/0f0'
 ];
 
 // https://www.yelp.com/developers/display_requirements

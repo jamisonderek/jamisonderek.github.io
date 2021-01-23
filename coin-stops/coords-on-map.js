@@ -27,6 +27,14 @@ function getYelpStarsOffset(spot) {
     return offset;
 }
 
+var infowindows = [];
+
+function closeAllInfoWindows() {
+    for(var i=0; i<infowindows.length;i++) {
+        infowindows[i].close();
+    }
+}
+
 function addMarker(map, spot) {
     // Add a marker.
     const location = { lat: spot.lat, lng: spot.long };
@@ -65,6 +73,7 @@ function addMarker(map, spot) {
         title: titleString
     });
     marker.addListener("click", () => {
+        closeAllInfoWindows();
         infowindow.open(map, marker);
         event.stopPropagation();
     });
@@ -72,7 +81,6 @@ function addMarker(map, spot) {
     return infowindow;
 }
 
-var infowindows = [];
 function initMap() {
     const response = window.getResponse();
     console.log('initMap got response: '+response);
@@ -93,8 +101,6 @@ function initMap() {
     }
     
     map.addListener("click", () => {
-        for(var i=0; i<infowindows.length;i++) {
-            infowindows[i].close();
-        }
+       closeAllInfoWindows();
     });
 }

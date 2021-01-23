@@ -17,7 +17,7 @@ pm.visualizer.set(
                 <td>{{transactions}}</td>
                 <td><img src={{image}} width="100" height="100" display="inline"></img></td>
                 <td>{{address}}</td>
-                <td>{{lat}},{{long}}</td>
+                <td>{{lat}}, {{long}}</td>
                 <td>{{distance}} meters</td>
                 <td>{{link}}</td>
             </tr>

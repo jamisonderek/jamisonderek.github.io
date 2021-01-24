@@ -130,7 +130,7 @@ function addBusinessMarker(map, spot) {
 
 function initMap() {
     const response = window.getResponse();
-    console.log(`response in initMap is ${response}`);
+    console.log(`response in initMap is ${JSON.stringify(response)}`);
 
     // Center the map around the starting point.
     const centerMapSpot = getMapCenterGeo(response);

@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "6d01058f-bf52-43a1-aea8-5baccea1887a",
+		"name": "Project Visualizer Assets",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "YelpVisualizerResults",
+			"item": [
+				{
+					"name": "coords-on-map.js",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{visualizerAssetsMock}}/js/coords-on-map.js?v=1.0",
+							"host": [
+								"{{visualizerAssetsMock}}"
+							],
+							"path": [
+								"js",
+								"coords-on-map.js"
+							],
+							"query": [
+								{
+									"key": "v",
+									"value": "1.0"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "coords-on-map.js",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{visualizerAssetsMock}}/js/coords-on-map.js?v=1.0",
+									"host": [
+										"{{visualizerAssetsMock}}"
+									],
+									"path": [
+										"js",
+										"coords-on-map.js"
+									],
+									"query": [
+										{
+											"key": "v",
+											"value": "1.0"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/javascript",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "console.log('This is the coords-on-map.js file.');\r\n\r\nconst icons = [\r\n    'https://placekitten.com/40/40',\r\n    'https://placekitten.com/41/40',\r\n    'https://placekitten.com/40/41',\r\n    'https://placekitten.com/41/41',\r\n    'https://placekitten.com/41/41'\r\n];\r\n\r\n// https://www.yelp.com/developers/display_requirements\r\n// https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_design_web/9b34e39ccbeb/assets/img/stars/stars.png\r\n\r\nfunction getMapCenterGeo(response) {\r\n    return { \r\n        lat: response[0].nearby[0].lat, \r\n        lng: response[0].nearby[0].long\r\n    };\r\n}\r\n\r\nfunction getYelpStarsOffset(spot) {\r\n    var offset = -240;\r\n    if (spot.stars>=1) {\r\n        offset += 18;\r\n        offset -= (spot.stars*2)*18;\r\n    }\r\n    return offset;\r\n}\r\n\r\nfunction addMarker(map, spot) {\r\n    // Add a marker.\r\n    const location = { lat: spot.lat, lng: spot.long };\r\n    const titleString = spot.name;\r\n\r\n    // You cannot open new window because the request was made in a sandboxed frame whose\r\n    //  'allow-popups' permission is not set.\r\n\r\n    const offset = getYelpStarsOffset(spot);\r\n    const expensive = (spot.coins==0)? \"\" : \"$$$$\".substring(0,spot.coins);\r\n    const categories = spot.categories;\r\n    const contentString = `\r\n    <div id=content width=\"500px\" height=\"300px\">\r\n        <img src=\"${spot.image}\" height=\"150px\"/><br/>\r\n        <div style=\"font-size: 2.4rem;\">${spot.name}</div>\r\n        <div title=\"3.0 star rating\" style=\"position: relative; overflow: hidden; width: 110px; height: 18px; background: url('https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_design_web/9b34e39ccbeb/assets/img/stars/stars.png') no-repeat; background-size: 132px 560px; display: inline-block; vertical-align: middle; background-position-x: 0px; background-position-y: ${offset}px; \">\r\n        </div>\r\n        <span style=\"vertical-align:middle\"><font size=\"+1\">${spot.review_count}&nbsp;&nbsp;&nbsp; ${expensive}</font></span><br/>\r\n        <div>${categories}</div>\r\n\r\n            <p><a href=\"${spot.link}\" onclick=\"console.log('Copying...'); var i=this.getElementsByTagName('input')[0]; i.select(); i.setSelectionRange(0, 1000); document.execCommand('copy'); console.log('Copied...'+i); return false;\"><img src=\r\n            \"https://s3-media2.fl.yelpcdn.com/assets/srv0/www_pages/95212dafe621/assets/img/brand_guidelines/yelp-2c.png\" height=\"40px\">Click to copy url.\r\n            <input type=\"text\" value=\"${spot.link}\" id=\"myInput\" style=\"height:1px; width:150px;\">\r\n            </a>\r\n    </div>\r\n    `;\r\n    const infowindow = new google.maps.InfoWindow({\r\n        content: contentString,\r\n    });\r\n    const marker = new google.maps.Marker({\r\n        position: location,\r\n        icon: icons[spot.coins],\r\n        map,\r\n        title: titleString\r\n    });\r\n    marker.addListener(\"click\", () => {\r\n        infowindow.open(map, marker);\r\n    });\r\n}\r\n\r\nfunction initMap() {\r\n    const response = window.getResponse();\r\n    console.log('initMap got response: '+response);\r\n\r\n    // Center the map around the starting point.\r\n    const centerMapSpot = getMapCenterGeo(response);\r\n    const map = new google.maps.Map(\r\n        document.getElementById(\"map\"), {\r\n        zoom: 15,\r\n        center: centerMapSpot,\r\n    });\r\n\r\n    for (var i=0; i<response.length; i++) {\r\n        for (var j=0; j<response[i].nearby.length; j++) {\r\n            console.log('adding marker ['+i+','+j+']: '+ response[i].nearby[j]);\r\n            addMarker(map, response[i].nearby[j]);\r\n        }\r\n    }\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "render-text.js",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{visualizerAssetsMock}}/render-text.js",
+							"host": [
+								"{{visualizerAssetsMock}}"
+							],
+							"path": [
+								"render-text.js"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "render-text.js",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{visualizerAssetsMock}}/render-text.js",
+									"host": [
+										"{{visualizerAssetsMock}}"
+									],
+									"path": [
+										"render-text.js"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "pm.visualizer.set(\r\n    `\r\n        <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css\">\r\n\r\n        {{#each response}}\r\n            <h2>{{stopName}}</h2>\r\n            {{mode}}|{{headsign}}|{{transportName}}\r\n\r\n            <table bgcolor=\"#FFFFFF\" border=\"2\">\r\n            {{#each nearby}}\r\n            <tr>\r\n                <td>{{name}}</td>\r\n                <td>{{stars}} stars of 5</td>\r\n                <td>{{review_count}} Yelp reviews</td>\r\n                <td>{{coins}} Yelp dollar signs</td>\r\n                <td>{{categories}}</td>\r\n                <td>{{transactions}}</td>\r\n                <td><img src={{image}} width=\"100\" height=\"100\" display=\"inline\"></img></td>\r\n                <td>{{address}}</td>\r\n                <td>{{lat}},{{long}}</td>\r\n                <td>{{distance}} meters</td>\r\n                <td>{{link}}</td>\r\n            </tr>\r\n            {{/each}}\r\n            </table>\r\n\r\n        {{/each}}\r\n    `\r\n    ,\r\n    {\r\n        response: aggregateResults\r\n    }\r\n);\r\n"
+						}
+					]
+				},
+				{
+					"name": "render-map.js",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{visualizerAssetsMock}}/render-map.js",
+							"host": [
+								"{{visualizerAssetsMock}}"
+							],
+							"path": [
+								"render-map.js"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "render-map.js",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{visualizerAssetsMock}}/render-map.js",
+									"host": [
+										"{{visualizerAssetsMock}}"
+									],
+									"path": [
+										"render-map.js"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "pm.visualizer.set(\r\n    `\r\n        <script src=\"https://polyfill.io/v3/polyfill.min.js?features=default\"></script>\r\n        <script>window.getResponse = function() { \r\n            var r = \"{{response}}\";\r\n            while (r.indexOf(\"&quot;\") > 0) {\r\n                r = r.replace(/&quot;/g, '\\\\\"');\r\n            }\r\n            \r\n            var j = JSON.parse(r);\r\n            return j;\r\n        }</script>\r\n        <script src='{{javascriptUri}}'></script>\r\n        <script\r\n      src=\"https://maps.googleapis.com/maps/api/js?key={{googleMapsApiKey}}&callback=initMap&libraries=&v=weekly\"\r\n      defer\r\n    ></script>\r\n        <style>\r\n         #map { height: 100%; }\r\n        html,body { height: 100%; margin: 0; padding: 0; }\r\n        </style>\r\n        <div id=\"map\"></div>\r\n        <div>Map should render above here...  If you see \"Oops! Something went wrong.\" then make sure your googlemap_api_key environment variable is set correctly.</div>\r\n    `\r\n    ,\r\n    {\r\n        response: JSON.stringify(aggregateResults),\r\n        googleMapsApiKey: googleMapsApiKey,\r\n        javascriptUri: javascriptUri\r\n    }\r\n);"
+						}
+					]
+				},
+				{
+					"name": "Sample Text Page with five stops",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var aggregateResults =\r",
+									"  pm.variables.get('aggregateResults');\r",
+									"\r",
+									"var widget =\r",
+									"  pm.variables.replaceIn('{{visualizerAssetsMock}}/render-text.js');\r",
+									"// MOCK-LIMIT: SO USING GITHUB.\r",
+									"widget = \"https://jamisonderek.github.io/coin-stops/render-text.js\";\r",
+									"\r",
+									"pm.sendRequest(widget, (error, response) => {\r",
+									"  if (error) {\r",
+									"    console.log(error);\r",
+									"  }\r",
+									"\r",
+									"  pm.test('response should be okay to process', () => {\r",
+									"    pm.expect(error).to.equal(null);\r",
+									"    pm.expect(response).to.have.property('code', 200);\r",
+									"    // SECURITY: We are in a mock, so eval is okay, since we control the data in the response.text() content.\r",
+									"    eval(response.text());\r",
+									"  });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var aggregateResults = \r",
+									"    [{\"kind\":\"start\",\"stopName\":\"14 St-Union Sq\",\"lat\":40.735736,\"long\":-73.990568,\"mode\":\"subway\",\"color\":\"#FCCC0A\",\"headsign\":\"Forest Hills-71 Av\",\"transportName\":\"R\",\"nearby\":[{\"id\":\"QcAUwIn9BmUsRQu3URhgzA\",\"name\":\"Bravo Pizza\",\"link\":\"https://www.yelp.com/biz/bravo-pizza-new-york-9?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"115 E 14th St, New York, NY 10003\",\"lat\":40.7342257,\"long\":-73.9890771,\"stars\":3.5,\"review_count\":189,\"coins\":1,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/PuX3-ew-7g3jGfhsrb4v7w/o.jpg\",\"categories\":\"Pizza,Italian\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":220},{\"id\":\"AiOb7w3Z9jS8XJdamgbU_A\",\"name\":\"McDonald's\",\"link\":\"https://www.yelp.com/biz/mcdonalds-new-york-105?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"39 Union Sq W, New York, NY 10003\",\"lat\":40.737016,\"long\":-73.9906,\"stars\":2,\"review_count\":93,\"coins\":1,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/g-1lOJ0iXo704N_HpcD--w/o.jpg\",\"categories\":\"Fast Food,Burgers,Coffee & Tea\",\"transactions\":[\"delivery\"],\"distance\":140},{\"id\":\"mlc6FvnDLOPDppn-97_52Q\",\"name\":\"Fraiche Maxx\",\"link\":\"https://www.yelp.com/biz/fraiche-maxx-new-york-2?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"213 Park Ave S, New York, NY 10003\",\"lat\":40.736786,\"long\":-73.98864,\"stars\":2.5,\"review_count\":63,\"coins\":2,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/Kh0LCXZm7QzQZDgfvID6mQ/o.jpg\",\"categories\":\"Delis,Juice Bars & Smoothies,Sandwiches\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":200}]},{\"kind\":\"intermediate\",\"stopName\":\"23 St\",\"lat\":40.741303,\"long\":-73.989344,\"nearby\":[{\"id\":\"p4EQbVuLddcTrgw_K8n8OA\",\"name\":\"McDonald's\",\"link\":\"https://www.yelp.com/biz/mcdonalds-new-york-139?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"26 E 23rd St, New York, NY 10010\",\"lat\":40.740654,\"long\":-73.987856,\"stars\":2.5,\"review_count\":50,\"coins\":1,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/ylrg7PtWlyu3P-HiPN91zw/o.jpg\",\"categories\":\"Coffee & Tea,Fast Food,Burgers\",\"transactions\":[\"delivery\"],\"distance\":140}]},{\"kind\":\"intermediate\",\"stopName\":\"28 St\",\"lat\":40.745494,\"long\":-73.988691,\"nearby\":[{\"id\":\"mXN9tmuDHZIfCeUBYqSRuQ\",\"name\":\"John Doe\",\"link\":\"https://www.yelp.com/biz/john-doe-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"253 5th Ave, New York, NY 10016\",\"lat\":40.74477,\"long\":-73.98701,\"stars\":3.5,\"review_count\":116,\"coins\":2,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/ubpwgbv-mTKFGI2gjH2Kfw/o.jpg\",\"categories\":\"American (New),Gastropubs\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":180},{\"id\":\"c-nOD2qAj9b2LfY_uK6WFA\",\"name\":\"Cafe 28\",\"link\":\"https://www.yelp.com/biz/cafe-28-new-york-4?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"245 5th Ave, New York, NY 10016\",\"lat\":40.7445372084,\"long\":-73.987168336272,\"stars\":3,\"review_count\":231,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/JEnH6855KMeGT50SO1DKkQ/o.jpg\",\"categories\":\"Salad,Buffets,Sandwiches\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":170}]},{\"kind\":\"intermediate\",\"stopName\":\"34 St-Herald Sq\",\"lat\":40.749567,\"long\":-73.98795,\"nearby\":[{\"id\":\"NMuZQuK6UU32VlSF6khh0w\",\"name\":\"Stout NYC\",\"link\":\"https://www.yelp.com/biz/stout-nyc-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"133 W 33rd St, New York, NY 10001\",\"lat\":40.7498631,\"long\":-73.989868,\"stars\":3.5,\"review_count\":941,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/AqbERunWTu5cJk8HgXB3gA/o.jpg\",\"categories\":\"Irish,Sports Bars\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":160},{\"id\":\"rtwQ8iky0etpuCxhhbELyg\",\"name\":\"TOAST\",\"link\":\"https://www.yelp.com/biz/toast-new-york-10?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"968 6th Ave, New York, NY 10018\",\"lat\":40.750671,\"long\":-73.986753,\"stars\":3,\"review_count\":36,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/dmAvttfthMwu2osmnwfbuw/o.jpg\",\"categories\":\"Cafes,Juice Bars & Smoothies,Acai Bowls\",\"transactions\":[],\"distance\":160},{\"id\":\"Uw-NC49hhjGo-kmPArHDlw\",\"name\":\"Jack Demsey's\",\"link\":\"https://www.yelp.com/biz/jack-demseys-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"36 W 33rd St, New York, NY 10001\",\"lat\":40.7483251,\"long\":-73.9869592,\"stars\":3.5,\"review_count\":241,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/xf7_4glEXhCPtQcsyJMclQ/o.jpg\",\"categories\":\"Sports Bars,Burgers,American (New)\",\"transactions\":[\"delivery\"],\"distance\":160},{\"id\":\"6ZIfKJpnZ465jN-diiwrzA\",\"name\":\"Feile\",\"link\":\"https://www.yelp.com/biz/feile-new-york-13?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"131 W 33rd St, New York, NY 10001\",\"lat\":40.74987,\"long\":-73.98975,\"stars\":3.5,\"review_count\":260,\"coins\":2,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/tg0aLREgQ7173piRDzJKXw/o.jpg\",\"categories\":\"Irish,American (New)\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":150},{\"id\":\"KvLrI20Abz6F9WzAIHmyWQ\",\"name\":\"Cafe R\",\"link\":\"https://www.yelp.com/biz/cafe-r-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"116 W 32nd St, New York, NY 10001\",\"lat\":40.74883,\"long\":-73.98972,\"stars\":3,\"review_count\":279,\"coins\":1,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/2xI-ZDEwj9bV1HSVSh4ykA/o.jpg\",\"categories\":\"Food Court,American (New),Breakfast & Brunch\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":180}]},{\"kind\":\"dest\",\"stopName\":\"Times Sq-42 St\",\"lat\":40.754672,\"long\":-73.986754,\"nearby\":[{\"id\":\"4ZU7DVD-tftFFd0PvT3jBQ\",\"name\":\"Artichoke Basille’s Pizza\",\"link\":\"https://www.yelp.com/biz/artichoke-basille-s-pizza-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"1410 Broadway, New York, NY 10018\",\"lat\":40.753257,\"long\":-73.986843,\"stars\":3,\"review_count\":15,\"coins\":0,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/l7KGTrjBSxLma0k2LhQzBg/o.jpg\",\"categories\":\"Pizza\",\"transactions\":[\"delivery\"],\"distance\":170},{\"id\":\"QPFxwkDYbc55C-nWQm36FA\",\"name\":\"99 Cent Fresh Pizza\",\"link\":\"https://www.yelp.com/biz/99-cent-fresh-pizza-new-york-12?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"143 W 40th St, New York, NY 10018\",\"lat\":40.754764,\"long\":-73.987443,\"stars\":4,\"review_count\":262,\"coins\":1,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/v3SVsedgxr-a5JUeg0CK0A/o.jpg\",\"categories\":\"Pizza\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":60},{\"id\":\"WaeTm5dn16d99mkuKBCPZg\",\"name\":\"Printers Alley\",\"link\":\"https://www.yelp.com/biz/printers-alley-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"215 W 40th St, New York, NY 10018\",\"lat\":40.7552,\"long\":-73.9887,\"stars\":3.5,\"review_count\":134,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/XFTTchY2AqNsAD3u-AIttA/o.jpg\",\"categories\":\"Southern,Sports Bars,Music Venues\",\"transactions\":[],\"distance\":170},{\"id\":\"PvXZCBxwQkkKaIM-SiY5yQ\",\"name\":\"Cook Eatery\",\"link\":\"https://www.yelp.com/biz/cook-eatery-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"1412 Broadway, New York, NY 10018\",\"lat\":40.7537150539816,\"long\":-73.9867730076181,\"stars\":2.5,\"review_count\":48,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/NTI5iNQxtlr-nWV7-9IffQ/o.jpg\",\"categories\":\"Delis,Sandwiches\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":110},{\"id\":\"ufBkr8JaT5rP-ndrGydasg\",\"name\":\"Frame Gourmet Eatery\",\"link\":\"https://www.yelp.com/biz/frame-gourmet-eatery-new-york-2?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"552 7th Ave, New York, NY 10018\",\"lat\":40.754638,\"long\":-73.98838,\"stars\":3,\"review_count\":105,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/i-os7Ja84dNtCgGFcPApPA/o.jpg\",\"categories\":\"Korean,Delis,Breakfast & Brunch\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":140}]}];\r",
+									"\r",
+									"pm.variables.set('aggregateResults', aggregateResults);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{visualizerAssetsMock}}?sample-text-page-with-five-stops.html",
+							"host": [
+								"{{visualizerAssetsMock}}"
+							],
+							"query": [
+								{
+									"key": "sample-text-page-with-five-stops.html",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Use the visualize tab",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{visualizerAssetsMock}}/sample-text-page-with-five-stops.html",
+									"host": [
+										"{{visualizerAssetsMock}}"
+									],
+									"path": [
+										"sample-text-page-with-five-stops.html"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "The HTML you want to view is injected by the \"Tests\" script.  Use the \"Visualize\" tab to see the results."
+						}
+					]
+				},
+				{
+					"name": "Sample Map Page with five stops",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var googleMapsApiKey = \r",
+									"  pm.variables.replaceIn('{{googlemaps_api_key}}');\r",
+									"\r",
+									"pm.test(\"Google API key is set correctly\", function () {\r",
+									"    pm.expect(googleMapsApiKey.split(' ').length).to.equal(1, 'Your API key should not have any spaces in it.  Please check your environment variables currentValue for googlemaps_api_key.');\r",
+									"});\r",
+									"\r",
+									"var javascriptUri =\r",
+									"  pm.variables.replaceIn('{{visualizerAssetsMock}}/js/coords-on-map.js?v=1.0');\r",
+									"\r",
+									"// MOCK-LIMIT: SO USING GITHUB.\r",
+									"javascriptUri = \"https://jamisonderek.github.io/coin-stops/coords-on-map.js\";\r",
+									"\r",
+									"var aggregateResults =\r",
+									"  pm.variables.get('aggregateResults');\r",
+									"\r",
+									"var widget =\r",
+									"  pm.variables.replaceIn('{{visualizerAssetsMock}}/render-map.js');\r",
+									"// MOCK-LIMIT: SO USING GITHUB.\r",
+									"widget = \"https://jamisonderek.github.io/coin-stops/render-map.js\";\r",
+									"\r",
+									"pm.sendRequest(widget, (error, response) => {\r",
+									"  if (error) {\r",
+									"    console.log(error);\r",
+									"  }\r",
+									"\r",
+									"  pm.test('response should be okay to process', () => {\r",
+									"    pm.expect(error).to.equal(null);\r",
+									"    pm.expect(response).to.have.property('code', 200);\r",
+									"    // SECURITY: We are in a mock, so eval is okay, since we control the data in the response.text() content.    \r",
+									"    eval(response.text());\r",
+									"  });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var aggregateResults = \r",
+									"    [{\"kind\":\"start\",\"stopName\":\"14 St-Union Sq\",\"lat\":40.735736,\"long\":-73.990568,\"mode\":\"subway\",\"color\":\"#FCCC0A\",\"headsign\":\"Forest Hills-71 Av\",\"transportName\":\"R\",\"nearby\":[{\"id\":\"QcAUwIn9BmUsRQu3URhgzA\",\"name\":\"Bravo Pizza\",\"link\":\"https://www.yelp.com/biz/bravo-pizza-new-york-9?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"115 E 14th St, New York, NY 10003\",\"lat\":40.7342257,\"long\":-73.9890771,\"stars\":3.5,\"review_count\":189,\"coins\":1,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/PuX3-ew-7g3jGfhsrb4v7w/o.jpg\",\"categories\":\"Pizza,Italian\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":220},{\"id\":\"AiOb7w3Z9jS8XJdamgbU_A\",\"name\":\"McDonald's\",\"link\":\"https://www.yelp.com/biz/mcdonalds-new-york-105?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"39 Union Sq W, New York, NY 10003\",\"lat\":40.737016,\"long\":-73.9906,\"stars\":2,\"review_count\":93,\"coins\":1,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/g-1lOJ0iXo704N_HpcD--w/o.jpg\",\"categories\":\"Fast Food,Burgers,Coffee & Tea\",\"transactions\":[\"delivery\"],\"distance\":140},{\"id\":\"mlc6FvnDLOPDppn-97_52Q\",\"name\":\"Fraiche Maxx\",\"link\":\"https://www.yelp.com/biz/fraiche-maxx-new-york-2?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"213 Park Ave S, New York, NY 10003\",\"lat\":40.736786,\"long\":-73.98864,\"stars\":2.5,\"review_count\":63,\"coins\":2,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/Kh0LCXZm7QzQZDgfvID6mQ/o.jpg\",\"categories\":\"Delis,Juice Bars & Smoothies,Sandwiches\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":200}]},{\"kind\":\"intermediate\",\"stopName\":\"23 St\",\"lat\":40.741303,\"long\":-73.989344,\"nearby\":[{\"id\":\"p4EQbVuLddcTrgw_K8n8OA\",\"name\":\"McDonald's\",\"link\":\"https://www.yelp.com/biz/mcdonalds-new-york-139?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"26 E 23rd St, New York, NY 10010\",\"lat\":40.740654,\"long\":-73.987856,\"stars\":2.5,\"review_count\":50,\"coins\":1,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/ylrg7PtWlyu3P-HiPN91zw/o.jpg\",\"categories\":\"Coffee & Tea,Fast Food,Burgers\",\"transactions\":[\"delivery\"],\"distance\":140}]},{\"kind\":\"intermediate\",\"stopName\":\"28 St\",\"lat\":40.745494,\"long\":-73.988691,\"nearby\":[{\"id\":\"mXN9tmuDHZIfCeUBYqSRuQ\",\"name\":\"John Doe\",\"link\":\"https://www.yelp.com/biz/john-doe-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"253 5th Ave, New York, NY 10016\",\"lat\":40.74477,\"long\":-73.98701,\"stars\":3.5,\"review_count\":116,\"coins\":2,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/ubpwgbv-mTKFGI2gjH2Kfw/o.jpg\",\"categories\":\"American (New),Gastropubs\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":180},{\"id\":\"c-nOD2qAj9b2LfY_uK6WFA\",\"name\":\"Cafe 28\",\"link\":\"https://www.yelp.com/biz/cafe-28-new-york-4?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"245 5th Ave, New York, NY 10016\",\"lat\":40.7445372084,\"long\":-73.987168336272,\"stars\":3,\"review_count\":231,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/JEnH6855KMeGT50SO1DKkQ/o.jpg\",\"categories\":\"Salad,Buffets,Sandwiches\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":170}]},{\"kind\":\"intermediate\",\"stopName\":\"34 St-Herald Sq\",\"lat\":40.749567,\"long\":-73.98795,\"nearby\":[{\"id\":\"NMuZQuK6UU32VlSF6khh0w\",\"name\":\"Stout NYC\",\"link\":\"https://www.yelp.com/biz/stout-nyc-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"133 W 33rd St, New York, NY 10001\",\"lat\":40.7498631,\"long\":-73.989868,\"stars\":3.5,\"review_count\":941,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/AqbERunWTu5cJk8HgXB3gA/o.jpg\",\"categories\":\"Irish,Sports Bars\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":160},{\"id\":\"rtwQ8iky0etpuCxhhbELyg\",\"name\":\"TOAST\",\"link\":\"https://www.yelp.com/biz/toast-new-york-10?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"968 6th Ave, New York, NY 10018\",\"lat\":40.750671,\"long\":-73.986753,\"stars\":3,\"review_count\":36,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/dmAvttfthMwu2osmnwfbuw/o.jpg\",\"categories\":\"Cafes,Juice Bars & Smoothies,Acai Bowls\",\"transactions\":[],\"distance\":160},{\"id\":\"Uw-NC49hhjGo-kmPArHDlw\",\"name\":\"Jack Demsey's\",\"link\":\"https://www.yelp.com/biz/jack-demseys-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"36 W 33rd St, New York, NY 10001\",\"lat\":40.7483251,\"long\":-73.9869592,\"stars\":3.5,\"review_count\":241,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/xf7_4glEXhCPtQcsyJMclQ/o.jpg\",\"categories\":\"Sports Bars,Burgers,American (New)\",\"transactions\":[\"delivery\"],\"distance\":160},{\"id\":\"6ZIfKJpnZ465jN-diiwrzA\",\"name\":\"Feile\",\"link\":\"https://www.yelp.com/biz/feile-new-york-13?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"131 W 33rd St, New York, NY 10001\",\"lat\":40.74987,\"long\":-73.98975,\"stars\":3.5,\"review_count\":260,\"coins\":2,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/tg0aLREgQ7173piRDzJKXw/o.jpg\",\"categories\":\"Irish,American (New)\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":150},{\"id\":\"KvLrI20Abz6F9WzAIHmyWQ\",\"name\":\"Cafe R\",\"link\":\"https://www.yelp.com/biz/cafe-r-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"116 W 32nd St, New York, NY 10001\",\"lat\":40.74883,\"long\":-73.98972,\"stars\":3,\"review_count\":279,\"coins\":1,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/2xI-ZDEwj9bV1HSVSh4ykA/o.jpg\",\"categories\":\"Food Court,American (New),Breakfast & Brunch\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":180}]},{\"kind\":\"dest\",\"stopName\":\"Times Sq-42 St\",\"lat\":40.754672,\"long\":-73.986754,\"nearby\":[{\"id\":\"4ZU7DVD-tftFFd0PvT3jBQ\",\"name\":\"Artichoke Basille’s Pizza\",\"link\":\"https://www.yelp.com/biz/artichoke-basille-s-pizza-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"1410 Broadway, New York, NY 10018\",\"lat\":40.753257,\"long\":-73.986843,\"stars\":3,\"review_count\":15,\"coins\":0,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/l7KGTrjBSxLma0k2LhQzBg/o.jpg\",\"categories\":\"Pizza\",\"transactions\":[\"delivery\"],\"distance\":170},{\"id\":\"QPFxwkDYbc55C-nWQm36FA\",\"name\":\"99 Cent Fresh Pizza\",\"link\":\"https://www.yelp.com/biz/99-cent-fresh-pizza-new-york-12?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"143 W 40th St, New York, NY 10018\",\"lat\":40.754764,\"long\":-73.987443,\"stars\":4,\"review_count\":262,\"coins\":1,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/v3SVsedgxr-a5JUeg0CK0A/o.jpg\",\"categories\":\"Pizza\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":60},{\"id\":\"WaeTm5dn16d99mkuKBCPZg\",\"name\":\"Printers Alley\",\"link\":\"https://www.yelp.com/biz/printers-alley-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"215 W 40th St, New York, NY 10018\",\"lat\":40.7552,\"long\":-73.9887,\"stars\":3.5,\"review_count\":134,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/XFTTchY2AqNsAD3u-AIttA/o.jpg\",\"categories\":\"Southern,Sports Bars,Music Venues\",\"transactions\":[],\"distance\":170},{\"id\":\"PvXZCBxwQkkKaIM-SiY5yQ\",\"name\":\"Cook Eatery\",\"link\":\"https://www.yelp.com/biz/cook-eatery-new-york?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"1412 Broadway, New York, NY 10018\",\"lat\":40.7537150539816,\"long\":-73.9867730076181,\"stars\":2.5,\"review_count\":48,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/NTI5iNQxtlr-nWV7-9IffQ/o.jpg\",\"categories\":\"Delis,Sandwiches\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":110},{\"id\":\"ufBkr8JaT5rP-ndrGydasg\",\"name\":\"Frame Gourmet Eatery\",\"link\":\"https://www.yelp.com/biz/frame-gourmet-eatery-new-york-2?adjust_creative=LRGAXDz2yLzEdwDCF6fwUw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=LRGAXDz2yLzEdwDCF6fwUw\",\"address\":\"552 7th Ave, New York, NY 10018\",\"lat\":40.754638,\"long\":-73.98838,\"stars\":3,\"review_count\":105,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/i-os7Ja84dNtCgGFcPApPA/o.jpg\",\"categories\":\"Korean,Delis,Breakfast & Brunch\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":140}]}];\r",
+									"\r",
+									"pm.variables.set('aggregateResults', aggregateResults);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{visualizerAssetsMock}}/render-map-page.html",
+							"host": [
+								"{{visualizerAssetsMock}}"
+							],
+							"path": [
+								"render-map-page.html"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sample Page",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{visualizerAssetsMock}}/render-map-page.html",
+									"host": [
+										"{{visualizerAssetsMock}}"
+									],
+									"path": [
+										"render-map-page.html"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "The HTML you want to view is injected by the \"Tests\" script.  Use the \"Visualize\" tab to see the results."
+						}
+					]
+				}
+			]
+		}
+	]
+}

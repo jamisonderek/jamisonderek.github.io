@@ -11,8 +11,8 @@ const icons = [
 
 function getMapCenterGeo(response) {
     return { 
-        lat: response[0].nearby[0].lat, 
-        lng: response[0].nearby[0].long
+        lat: response[0].lat, 
+        lng: response[0].long
     };
 }
 

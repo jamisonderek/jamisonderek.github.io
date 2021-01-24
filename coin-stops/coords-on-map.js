@@ -1,5 +1,6 @@
 console.log('This is the coords-on-map.js file.');
 
+// There is a limit on mock server calls, so just host the coinstop images on github.com.
 const icons = [
     'https://jamisonderek.github.io/coin-stops/0-coins.png',
     'https://jamisonderek.github.io/coin-stops/1-coins.png',
@@ -7,9 +8,6 @@ const icons = [
     'https://jamisonderek.github.io/coin-stops/3-coins.png',
     'https://jamisonderek.github.io/coin-stops/4-coins.png'
 ];
-
-// https://www.yelp.com/developers/display_requirements
-// https://s3-media0.fl.yelpcdn.com/assets/srv0/yelp_design_web/9b34e39ccbeb/assets/img/stars/stars.png
 
 function getMapCenterGeo(response) {
     return { 
@@ -40,13 +38,22 @@ function addBusinessMarker(map, spot) {
     const location = { lat: spot.lat, lng: spot.long };
     const titleString = spot.name;
 
-    // You cannot open new window because the request was made in a sandboxed frame whose
-    //  'allow-popups' permission is not set.
-
+    // Sadly, the Visualizer was made in a sandboxed frame whose 'allow-popups' permission is not set.
+    // So we can't navigate to the help page, best we can do is allow the user to copy the url.
+    
+    // NOTE: https://www.yelp.com/developers/display_requirements has restrictions on how we show the star ratings
+    // and where we show the yelp burst (above the fold).
     const offset = getYelpStarsOffset(spot);
+    
+    // Convert coins back into $ when we show in the popup.
     const expensive = (spot.coins==0)? "" : "$$$$".substring(0,spot.coins);
+
+    // Other interesting data to show in the popup.
     const categories = spot.categories;
     const transactions = (spot.transactions == undefined) ? '' : spot.transactions.join(',');
+    
+    // NOTE: yelp.com br
+    
     const contentString = `
     <div id=content width="500px" height="300px">
         <img src="${spot.image}" height="150px"/><br/>

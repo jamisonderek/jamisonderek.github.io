@@ -37,11 +37,11 @@ function closeAllInfoWindows() {
 
 function addEndpointMarker(map, spot) {
     const location = { lat: spot.lat, lng: spot.long };
-    const titleString = spot.stopName;
-    const mode = spot.mode;
-    const headsign = spot.headsign;
-    const transportName = spot.transportName;
-    const color = spot.color;
+    const titleString = spot.stopName !== undefined : "Here";
+    const mode = spot.mode !== undefined ? spot.mode : "";
+    const headsign = spot.headsign !== undefined ? spot.headsign : "";
+    const transportName = spot.transportName !== undefined ? spot.transportName : "";
+    const color = spot.color !== undefined ? spot.color : "#aaa";
     const boardingMessage = spot.kind === 'start' ? "GET ON AT" : "GET OFF AT";
     
     const contentString = `

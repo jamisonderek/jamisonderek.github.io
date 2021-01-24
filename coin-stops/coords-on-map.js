@@ -35,17 +35,18 @@ function closeAllInfoWindows() {
     }
 }
 
-function addStartMarker(map, spot) {
+function addEndpointMarker(map, spot) {
     const location = { lat: spot.lat, lng: spot.long };
     const titleString = spot.stopName;
     const mode = spot.mode;
     const headsign = spot.headsign;
     const transportName = spot.transportName;
     const color = spot.color;
+    const boardingMessage = spot.kind === 'start' ? "GET ON AT" : "GET OFF AT";
     
     const contentString = `
         <div id=content width="500px" height="300px">
-           <div style="font-size: 2.4rem;">${titleString}</div>
+           <div style="font-size: 2.4rem;">${boardingMessage}<br/>${titleString}</div>
            <div style="foreground-color: ${color}; background-color: ${color};" width="100%">.</div>
            <div>${mode}  ${headsign}</div>
            <div>${transportName}</div>
@@ -142,10 +143,10 @@ function initMap() {
 
     for (var i=0; i<response.length; i++) {
         
-        if (response[i].kind === 'start') {
-            infowindows.push(addStartMarker(map, response[i]));
+        if (response[i].kind === 'start' || response[i].kind === 'dest') {
+            infowindows.push(addEndpointMarker(map, response[i]));
         }
-        
+
         for (var j=0; j<response[i].nearby.length; j++) {
             infowindows.push(addBusinessMarker(map, response[i].nearby[j]));
         }

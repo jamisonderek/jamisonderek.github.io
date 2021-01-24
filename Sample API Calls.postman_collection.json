@@ -1,0 +1,584 @@
+{
+	"info": {
+		"_postman_id": "4dd9a0af-dade-4ce0-a138-e18f4648a676",
+		"name": "Sample API Calls",
+		"description": "This collection houses test requests made to various APIs encountered during the hack, since there's so many APIs out there. These requests are expected to be ran individually and don't have any type of \"workflow.\"\n\n## Setup\n* See the ***Businesses Nearby Subway Stops*** collection. All environment variables in this collection are dependent on that collection. ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "LA Metro Example Latitude and Longitude",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"location\", \"sunnyvale\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{yelp_api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.metro.net/agencies/lametro-rail/routes/801/stops/",
+					"protocol": "https",
+					"host": [
+						"api",
+						"metro",
+						"net"
+					],
+					"path": [
+						"agencies",
+						"lametro-rail",
+						"routes",
+						"801",
+						"stops",
+						""
+					]
+				},
+				"description": "https://api.metro.net"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Restaurants by Location Yelp Example",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"location\", \"sunnyvale\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{yelp_api_key}}",
+						"description": "Your API KEY from yelp",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{start_url}}/search?location={{location}}",
+					"host": [
+						"{{start_url}}"
+					],
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "location",
+							"value": "{{location}}",
+							"description": "String indicating city name"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Latitude & Longitude of Address Opencage Example",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Let's make sure the request is successful",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Making sure provided address actually is a bus stop",
+							"pm.test(\"Making sure the provided address includes a bus stop\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"bus_stop\");",
+							"});",
+							"",
+							"// Destructuring returned JSON object",
+							"if(pm.response.code == 200){",
+							"    const jsonObject= pm.response.json();",
+							"    const resultList = jsonObject[\"results\"];",
+							"",
+							"    // Scrape any data pertaining to bus stops ",
+							"    resultList.forEach((result) => {",
+							"        if(result[\"components\"][\"_type\"] == \"bus_stop\"){",
+							"            // Logging bus stop deets",
+							"            console.log(result);",
+							"            const lat = result[\"geometry\"][\"lat\"];",
+							"            const lng = result[\"geometry\"][\"lng\"];",
+							"            pm.environment.set(\"lat\", lat);",
+							"            pm.environment.set(\"lng\", lng);",
+							"        }",
+							"  });",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.opencagedata.com/geocode/v1/json?q={{address}}&key={{opencage_api_key}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"opencagedata",
+						"com"
+					],
+					"path": [
+						"geocode",
+						"v1",
+						"json"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "{{address}}",
+							"description": "String indicating the address of the location you want the Lat Long Coordinates of."
+						},
+						{
+							"key": "key",
+							"value": "{{opencage_api_key}}",
+							"description": "Your API KEY from opencage"
+						}
+					]
+				},
+				"description": "Provide an address as a parameter and then the GET requests retrieves LAT/LONG coordinates. what's cool about this is that opencage labels what each point of interest is so I can scrape for relevant data which is pretty much a bus stop\n\nUsed the opencage API for this request"
+			},
+			"response": []
+		},
+		{
+			"name": "Stations.csv",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const parse = require('csv-parse/lib/sync');",
+							"",
+							"// Converts csv output to JSON format using external library",
+							"const responseJson = parse(pm.response.text());",
+							"console.log(responseJson);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://atisdata.s3.amazonaws.com/Station/Stations.csv",
+					"protocol": "https",
+					"host": [
+						"atisdata",
+						"s3",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Station",
+						"Stations.csv"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MTA Test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://bustime.mta.info/api/where/stop/MTA_405284.json?key=TEST",
+					"protocol": "https",
+					"host": [
+						"bustime",
+						"mta",
+						"info"
+					],
+					"path": [
+						"api",
+						"where",
+						"stop",
+						"MTA_405284.json"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "TEST"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Restaurants nearby each Subway Station Example",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Let's make sure the request is successful",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"if(pm.response.code == 200){",
+							"    const jsonObject = pm.response.json();",
+							"    const resultList = jsonObject[\"businesses\"];",
+							"",
+							"    resultList.forEach((result) => {",
+							"        let restaurantName = result[\"name\"];",
+							"        let address = result[\"location\"][\"display_address\"].join(', ');",
+							"        let rating = result[\"rating\"];",
+							"        let imageUrl = result[\"image_url\"];",
+							"        let restaurantCoord = result[\"coordinates\"];",
+							"        let reviewCount = result[\"review_count\"];",
+							"        let distanceFromStation = result[\"distance\"];",
+							"",
+							"        console.log(restaurantName);",
+							"        console.log(address);",
+							"        console.log(rating);",
+							"        console.log(imageUrl);",
+							"        console.log(restaurantCoord);",
+							"        console.log(reviewCount);",
+							"        console.log(distanceFromStation);",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{yelp_api_key}}",
+						"description": "Your API KEY from yelp",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.yelp.com/v3/businesses/search?latitude=40.749567&longitude=-73.98795&term=restaurants&open_now=true&radius=175&limit=1",
+					"protocol": "https",
+					"host": [
+						"api",
+						"yelp",
+						"com"
+					],
+					"path": [
+						"v3",
+						"businesses",
+						"search"
+					],
+					"query": [
+						{
+							"key": "latitude",
+							"value": "40.749567",
+							"description": "Latitude of location"
+						},
+						{
+							"key": "longitude",
+							"value": "-73.98795",
+							"description": "Longitude of location"
+						},
+						{
+							"key": "term",
+							"value": "restaurants",
+							"description": "FOOD"
+						},
+						{
+							"key": "open_now",
+							"value": "true",
+							"description": "Return all open restaurants"
+						},
+						{
+							"key": "radius",
+							"value": "175",
+							"description": "in meters (This about 2 blocks so really close)"
+						},
+						{
+							"key": "limit",
+							"value": "1"
+						}
+					]
+				},
+				"description": "TODO documentation\n\nUsed the YELP API to get open restaurants nearby"
+			},
+			"response": []
+		},
+		{
+			"name": "DateTime to Unix Timestamp",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"variable_key\", \"variable_value\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"Datetime\": \"2019/02/11 13:38:00\"}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://showcase.api.linx.twenty57.net/UnixTime/tounixtimestamp",
+					"protocol": "https",
+					"host": [
+						"showcase",
+						"api",
+						"linx",
+						"twenty57",
+						"net"
+					],
+					"path": [
+						"UnixTime",
+						"tounixtimestamp"
+					]
+				},
+				"description": "Takes DateTime, makes a POST, and you get a Unix Timestamp"
+			},
+			"response": []
+		},
+		{
+			"name": "Twitter Test",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// TODO: Tweet shared link on here from dropbox.\r",
+							"const dropboxLink = pm.environment.get(\"tweet_url\");\r",
+							"pm.variables.set(\"tweet\", \"These are the businesses I found! \" + dropboxLink);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": [
+						{
+							"key": "signatureMethod",
+							"value": "HMAC-SHA1",
+							"type": "string"
+						},
+						{
+							"key": "addParamsToHeader",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "tokenSecret",
+							"value": "{{twitter_token_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "token",
+							"value": "{{twitter_access_token}}",
+							"type": "string"
+						},
+						{
+							"key": "consumerSecret",
+							"value": "{{twitter_token_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "consumerKey",
+							"value": "{{twitter_consumer_key}}",
+							"type": "string"
+						},
+						{
+							"key": "version",
+							"value": "1.0",
+							"type": "string"
+						},
+						{
+							"key": "addEmptyParamsToSign",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://api.twitter.com/1.1/statuses/update.json?status={{tweet}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"twitter",
+						"com"
+					],
+					"path": [
+						"1.1",
+						"statuses",
+						"update.json"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "{{tweet}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth1",
+		"oauth1": [
+			{
+				"key": "tokenSecret",
+				"value": "{{twitter_token_secret}}",
+				"type": "string"
+			},
+			{
+				"key": "token",
+				"value": "{{twitter_access_token}}",
+				"type": "string"
+			},
+			{
+				"key": "consumerSecret",
+				"value": "{{twitter_consumer_secret}}",
+				"type": "string"
+			},
+			{
+				"key": "consumerKey",
+				"value": "{{twitter_consumer_key}}",
+				"type": "string"
+			},
+			{
+				"key": "addParamsToHeader",
+				"value": true,
+				"type": "boolean"
+			},
+			{
+				"key": "signatureMethod",
+				"value": "HMAC-SHA1",
+				"type": "string"
+			},
+			{
+				"key": "version",
+				"value": "1.0",
+				"type": "string"
+			},
+			{
+				"key": "addEmptyParamsToSign",
+				"value": false,
+				"type": "boolean"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "start_url",
+			"value": "https://api.yelp.com/v3/businesses"
+		},
+		{
+			"key": "location",
+			"value": "sunnyvale"
+		},
+		{
+			"key": "stationLocations",
+			"value": "[{\"kind\":\"start\",\"stopName\":\"14 St-Union Sq\",\"lat\":40.735736,\"long\":-73.990568,\"mode\":\"subway\",\"color\":\"#FCCC0A\",\"headsign\":\"Forest Hills-71 Av\",\"transportName\":\"R\",\"nearby\":[{\"id\":\"vbvtWBbO3Q-Q15w7aHxgVg\",\"name\":\"Max Brenner - New York\",\"link\":\"https://www.yelp.com/biz/max-brenner-new-york-new-york-2?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"841 Broadway, New York, NY 10003\",\"lat\":40.7342670594805,\"long\":-73.9910549187747,\"stars\":3.5,\"review_count\":4664,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/1Fzl2DqnRJrr-oYUzZbgcg/o.jpg\",\"categories\":\"Desserts,American (Traditional),Breakfast & Brunch\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":170},{\"id\":\"FizBsTIAJwNrImIG1mPDcg\",\"name\":\"Barn Joo\",\"link\":\"https://www.yelp.com/biz/barn-joo-new-york-3?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"35 Union Sq W, New York, NY 10003\",\"lat\":40.73684,\"long\":-73.99069,\"stars\":4,\"review_count\":1637,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/i7ReKaGzUGGXuisJFIV-RA/o.jpg\",\"categories\":\"Korean,Cocktail Bars,Tapas/Small Plates\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":130},{\"id\":\"GBWMJJ4_rDWqiXJ7AvHAOg\",\"name\":\"15 East Restaurant\",\"link\":\"https://www.yelp.com/biz/15-east-restaurant-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"15 E 15th St, New York, NY 10003\",\"lat\":40.7363799,\"long\":-73.99213,\"stars\":4,\"review_count\":632,\"coins\":4,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/rktimrgpd3ccnmCY5tnmkA/o.jpg\",\"categories\":\"Japanese,Sushi Bars\",\"transactions\":[\"delivery\"],\"distance\":150},{\"id\":\"T8WfkzuVi96qCpj1tWjlxw\",\"name\":\"Spice\",\"link\":\"https://www.yelp.com/biz/spice-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"39 E 13th St, New York, NY 10003\",\"lat\":40.7345,\"long\":-73.9919,\"stars\":3.5,\"review_count\":1548,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/Xv-vdQlggFKMY9lyVdd3aA/o.jpg\",\"categories\":\"Thai,Cocktail Bars\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":170},{\"id\":\"Zk3d5782ZLu8eGllhbeS3Q\",\"name\":\"Barnes & Noble\",\"link\":\"https://www.yelp.com/biz/barnes-and-noble-new-york-3?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"33 E 17th St, Union Square, New York, NY 10003\",\"lat\":40.7371482849121,\"long\":-73.9894027709961,\"stars\":4,\"review_count\":474,\"coins\":2,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/iKxZT2PyK4APF3ny2mKFQg/o.jpg\",\"categories\":\"Newspapers & Magazines,Bookstores,Coffee & Tea\",\"transactions\":[],\"distance\":200}]},{\"kind\":\"intermediate\",\"stopName\":\"23 St\",\"lat\":40.741303,\"long\":-73.989344,\"nearby\":[{\"id\":\"FEVQpbOPOwAPNIgO7D3xxw\",\"name\":\"Shake Shack\",\"link\":\"https://www.yelp.com/biz/shake-shack-new-york-2?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"E 23rd St Madison Avenue, Madison Square Park, New York, NY 10010\",\"lat\":40.7417320034487,\"long\":-73.9881852006622,\"stars\":4,\"review_count\":5605,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/5Tnq5PlJ1wkEU5op-yolcg/o.jpg\",\"categories\":\"Burgers,Food Stands,Ice Cream & Frozen Yogurt\",\"transactions\":[\"delivery\"],\"distance\":110},{\"id\":\"28CNHYULci66pJAz-0_pOg\",\"name\":\"Cote\",\"link\":\"https://www.yelp.com/biz/cote-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"16 W 22nd St, New York, NY 10010\",\"lat\":40.741192,\"long\":-73.991314,\"stars\":4,\"review_count\":944,\"coins\":3,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/6uayQ7nnC4j_CyHeTVh27Q/o.jpg\",\"categories\":\"Korean,Steakhouses,Cocktail Bars\",\"transactions\":[],\"distance\":170},{\"id\":\"R3ci6iQRLIIK0Eq1-cY_pw\",\"name\":\"Madison Square Park\",\"link\":\"https://www.yelp.com/biz/madison-square-park-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"Eleven Madison Ave, Fl 15, New York, NY 10010\",\"lat\":40.7422133587202,\"long\":-73.9879736510651,\"stars\":4.5,\"review_count\":382,\"coins\":0,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/haMmSwU7xGZffPeXIXUjwg/o.jpg\",\"categories\":\"Parks\",\"transactions\":[],\"distance\":150},{\"id\":\"6ujYWjs1FTksvuVxuzjUYA\",\"name\":\"Almond\",\"link\":\"https://www.yelp.com/biz/almond-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"12 E 22nd St, New York, NY 10010\",\"lat\":40.7400817871094,\"long\":-73.9887542724609,\"stars\":4,\"review_count\":1028,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/vvfpKa_InIeZ6CFdKZClpA/o.jpg\",\"categories\":\"American (New),French\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":140},{\"id\":\"sCHiXF4mZcsiY8_cBHNiqw\",\"name\":\"deep indian kitchen - indikitch\",\"link\":\"https://www.yelp.com/biz/deep-indian-kitchen-indikitch-new-york-20?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"25 W 23rd St, New York, NY 10010\",\"lat\":40.7422142028809,\"long\":-73.9904403686523,\"stars\":4,\"review_count\":696,\"coins\":2,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/svQ0L4AgNphpVjixHrzJsw/o.jpg\",\"categories\":\"Indian\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":140}]},{\"kind\":\"intermediate\",\"stopName\":\"28 St\",\"lat\":40.745494,\"long\":-73.988691,\"nearby\":[{\"id\":\"TBp9gdS6xEbSQqffVZ7iag\",\"name\":\"KazuNori  | The Original Hand Roll Bar\",\"link\":\"https://www.yelp.com/biz/kazunori-the-original-hand-roll-bar-new-york-2?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"15 W 28th St, New York, NY 10001\",\"lat\":40.74519,\"long\":-73.98824,\"stars\":4.5,\"review_count\":966,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/6nGFPQpDePK-ThXVez64jQ/o.jpg\",\"categories\":\"Sushi Bars,Japanese\",\"transactions\":[\"delivery\"],\"distance\":60},{\"id\":\"1z5Nu66M6W8mk5Ap4osZwA\",\"name\":\"The NoMad Restaurant\",\"link\":\"https://www.yelp.com/biz/the-nomad-restaurant-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"1170 Broadway, New York, NY 10001\",\"lat\":40.7449,\"long\":-73.988482,\"stars\":4,\"review_count\":1483,\"coins\":3,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/ct1j_pmuauuFqGK5p2IMTg/o.jpg\",\"categories\":\"French,American (New),Gastropubs\",\"transactions\":[],\"distance\":70},{\"id\":\"B55Ocx5RBWxo6AGSucYSIA\",\"name\":\"ilili\",\"link\":\"https://www.yelp.com/biz/ilili-new-york-2?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"236 5th Ave, New York, NY 10001\",\"lat\":40.74435,\"long\":-73.98778,\"stars\":4,\"review_count\":2423,\"coins\":3,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/uDoD1yzG5naCvmFYmklyAg/o.jpg\",\"categories\":\"Mediterranean,Lebanese,Cocktail Bars\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":140},{\"id\":\"t0Bel7xLMUt5g8qIpBylZg\",\"name\":\"&pizza - NoMad\",\"link\":\"https://www.yelp.com/biz/and-pizza-nomad-new-york-2?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"15 W 28th St, New York, NY 10001\",\"lat\":40.7453193441078,\"long\":-73.98810976503324,\"stars\":4.5,\"review_count\":446,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/Y0tNktpWGFl419vT2-i8SQ/o.jpg\",\"categories\":\"Pizza,Vegan,Vegetarian\",\"transactions\":[],\"distance\":50},{\"id\":\"Xd_l7jtUAZZAAvK8-mI2Jw\",\"name\":\"The Smith\",\"link\":\"https://www.yelp.com/biz/the-smith-new-york-7?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"1150 Broadway, New York, NY 10010\",\"lat\":40.74424,\"long\":-73.98878,\"stars\":4,\"review_count\":1018,\"coins\":2,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/iRt2bcEEBQgy6qQQwlPvtQ/o.jpg\",\"categories\":\"American (New),Breakfast & Brunch,Cocktail Bars\",\"transactions\":[\"pickup\",\"delivery\"],\"distance\":140}]},{\"kind\":\"intermediate\",\"stopName\":\"34 St-Herald Sq\",\"lat\":40.749567,\"long\":-73.98795,\"nearby\":[{\"id\":\"pQuZDnefX038xurT1BhDXA\",\"name\":\"Keens Steakhouse\",\"link\":\"https://www.yelp.com/biz/keens-steakhouse-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"72 W 36th St, New York, NY 10018\",\"lat\":40.75071,\"long\":-73.98652,\"stars\":4,\"review_count\":2588,\"coins\":4,\"image\":\"https://s3-media1.fl.yelpcdn.com/bphoto/Wt-lr0rX2f-lncs05SWDlA/o.jpg\",\"categories\":\"Steakhouses,Desserts,Pubs\",\"transactions\":[\"delivery\"],\"distance\":170},{\"id\":\"JeCtYANe0eqW8xe1SN3lWg\",\"name\":\"Turntable Chicken Jazz\",\"link\":\"https://www.yelp.com/biz/turntable-chicken-jazz-new-york-2?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"20 W 33rd St, New York, NY 10001\",\"lat\":40.74828,\"long\":-73.98649,\"stars\":4,\"review_count\":2030,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/9Ym1aFMnj6eqEBZngQg3Iw/o.jpg\",\"categories\":\"Chicken Wings,Bars,Korean\",\"transactions\":[\"delivery\"],\"distance\":200},{\"id\":\"qCf1QN11Qdncpqb7PhuyVw\",\"name\":\"The Rag Trader & Bo Peep Cocktail and Highball Store\",\"link\":\"https://www.yelp.com/biz/the-rag-trader-and-bo-peep-cocktail-and-highball-store-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"70 W 36th St, New York, NY 10018\",\"lat\":40.75059,\"long\":-73.98628,\"stars\":4.5,\"review_count\":465,\"coins\":2,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/i8TwHAYZBxv950tCkhtjjw/o.jpg\",\"categories\":\"Bars,American (Traditional),Piano Bars\",\"transactions\":[],\"distance\":180},{\"id\":\"rSY3MyWqpuy3dNuUN4zQ_g\",\"name\":\"Petit Poulet\",\"link\":\"https://www.yelp.com/biz/petit-poulet-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"52 W 33rd St, New York, NY 10001\",\"lat\":40.7487341906226,\"long\":-73.98756886040884,\"stars\":4,\"review_count\":425,\"coins\":2,\"image\":\"https://s3-media4.fl.yelpcdn.com/bphoto/JQzJY6lOUf5aF3oTGD_Vaw/o.jpg\",\"categories\":\"French,Desserts,Cocktail Bars\",\"transactions\":[],\"distance\":100},{\"id\":\"KEBKGGGkDhnuYdKrjzZblw\",\"name\":\"Samwon Garden Korean BBQ\",\"link\":\"https://www.yelp.com/biz/samwon-garden-korean-bbq-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"37 W 32nd St, New York, NY 10001\",\"lat\":40.74811,\"long\":-73.9872,\"stars\":4,\"review_count\":472,\"coins\":3,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/lSu7UdF32e-TVRDb8op83Q/o.jpg\",\"categories\":\"Korean,Barbeque\",\"transactions\":[\"delivery\",\"restaurant_reservation\"],\"distance\":170}]},{\"kind\":\"dest\",\"stopName\":\"Times Sq-42 St\",\"lat\":40.754672,\"long\":-73.986754,\"nearby\":[{\"id\":\"KEEXuHCYhsQJ-zpJhu98bA\",\"name\":\"Joe's Pizza\",\"link\":\"https://www.yelp.com/biz/joes-pizza-new-york-148?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"1435 Broadway, New York, NY 10018\",\"lat\":40.7545841255557,\"long\":-73.9870039190341,\"stars\":4,\"review_count\":1146,\"coins\":1,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/5P5i2QZhxCen55PNdU_TTg/o.jpg\",\"categories\":\"Pizza\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":20},{\"id\":\"Nz3ednIoYXg1NwOn7jnTOQ\",\"name\":\"The Counter\",\"link\":\"https://www.yelp.com/biz/the-counter-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"7 Times Square, Times Square Tower, New York, NY 10036\",\"lat\":40.7554585,\"long\":-73.9869055,\"stars\":3.5,\"review_count\":884,\"coins\":2,\"image\":\"https://s3-media3.fl.yelpcdn.com/bphoto/xSo12TS0dZdrj8TPEYu-8w/o.jpg\",\"categories\":\"Burgers,American (New)\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":90},{\"id\":\"QPFxwkDYbc55C-nWQm36FA\",\"name\":\"99 Cent Fresh Pizza\",\"link\":\"https://www.yelp.com/biz/99-cent-fresh-pizza-new-york-12?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"143 W 40th St, New York, NY 10018\",\"lat\":40.754764,\"long\":-73.987443,\"stars\":4,\"review_count\":262,\"coins\":1,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/v3SVsedgxr-a5JUeg0CK0A/o.jpg\",\"categories\":\"Pizza\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":60},{\"id\":\"NZaq_ygLr4N8-blY5dGx-g\",\"name\":\"Paul's On Times Square\",\"link\":\"https://www.yelp.com/biz/pauls-on-times-square-new-york?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"136 W 42nd St, New York, NY 10036\",\"lat\":40.75522,\"long\":-73.98539,\"stars\":4,\"review_count\":303,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/HuX7fMKvAlbhpTid-o0v_w/o.jpg\",\"categories\":\"Bars,Pizza,Italian\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":110},{\"id\":\"aq0SXPyy_dpFjcfvTDRxBA\",\"name\":\"Wasabi Sushi & Bento\",\"link\":\"https://www.yelp.com/biz/wasabi-sushi-and-bento-new-york-3?adjust_creative=Edpzj_1GL-Z-Ctf2RImOHQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=Edpzj_1GL-Z-Ctf2RImOHQ\",\"address\":\"561 7th Ave, New York, NY 10018\",\"lat\":40.75484,\"long\":-73.9876,\"stars\":3.5,\"review_count\":489,\"coins\":2,\"image\":\"https://s3-media2.fl.yelpcdn.com/bphoto/KNBVUWiCJskePBUNKtd0yQ/o.jpg\",\"categories\":\"Sushi Bars,Japanese,Salad\",\"transactions\":[\"delivery\",\"pickup\"],\"distance\":60}]}]"
+		},
+		{
+			"key": "startAddress",
+			"value": ""
+		},
+		{
+			"key": "endAddress",
+			"value": ""
+		}
+	]
+}

@@ -29,8 +29,43 @@ var infowindows = [];
 
 function closeAllInfoWindows() {
     for(var i=0; i<infowindows.length;i++) {
-        infowindows[i].close();
+        if (infowindows[i] !== undefined) {
+            infowindows[i].close();
+        }
     }
+}
+
+function addStartMarker(map, spot) {
+    const location = { lat: spot.lat, lng: spot.long };
+    const titleString = spot.stopName;
+    const mode = spot.mode;
+    const headsign = spot.headsign;
+    const transportName = spot.transportName;
+    const color = spot.color;
+    
+    const contentString = `
+        <div id=content width="500px" height="300px">
+           <div style="font-size: 2.4rem;">${spot.name}</div>
+           <div style="foreground-color: ${color}; background-color: ${color}">............</div>
+           <div>${mode}  ${headsign}</div>
+           <div>${transportName}</div>
+        </div>`;
+    
+    const infowindow = new google.maps.InfoWindow({
+        content: contentString,
+    });
+    
+    const marker = new google.maps.Marker({
+        position: location,
+        map,
+        title: titleString
+    });
+
+    marker.addListener("click", () => {
+        closeAllInfoWindows();
+        infowindow.open(map, marker);
+        event.stopPropagation();
+    });
 }
 
 function addBusinessMarker(map, spot) {
@@ -100,6 +135,11 @@ function initMap() {
     });
 
     for (var i=0; i<response.length; i++) {
+        
+        if (response[i].kind === 'start') {
+            infowindows.push(addStartMarker(map, response[i]));
+        }
+        
         for (var j=0; j<response[i].nearby.length; j++) {
             infowindows.push(addBusinessMarker(map, response[i].nearby[j]));
         }

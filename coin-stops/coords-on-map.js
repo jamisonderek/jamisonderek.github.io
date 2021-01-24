@@ -89,6 +89,8 @@ function addBusinessMarker(map, spot) {
     const categories = spot.categories;
     const transactions = (spot.transactions == undefined) ? '' : spot.transactions.join(',');
     
+    const hours = spot.hours.join('<br/>');
+    
     // NOTE: yelp.com br
     
     const contentString = `
@@ -100,6 +102,7 @@ function addBusinessMarker(map, spot) {
         <span style="vertical-align:middle"><font size="+1">${spot.review_count}&nbsp;&nbsp;&nbsp; ${expensive}</font></span><br/>
         <div>${categories}</div>
         <div>${transactions}</div>
+        <div>${hours}</div>
 
             <p><a href="${spot.link}" onclick="console.log('Copying...'); var i=this.getElementsByTagName('input')[0]; i.select(); i.setSelectionRange(0, 1000); document.execCommand('copy'); console.log('Copied...'+i); return false;"><img src=
             "https://s3-media2.fl.yelpcdn.com/assets/srv0/www_pages/95212dafe621/assets/img/brand_guidelines/yelp-2c.png" height="40px">Click to copy url.<br/>

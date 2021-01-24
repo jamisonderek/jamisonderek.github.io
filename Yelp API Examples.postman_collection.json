@@ -1,0 +1,224 @@
+{
+	"info": {
+		"_postman_id": "021d78da-cd45-48d6-bc22-460e67632b72",
+		"name": "Yelp API Examples",
+		"description": "Make this bettter than the existing one",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sorted",
+			"item": [
+				{
+					"name": "Get Open Cheapest Business",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"location2\", \"sunnyvale\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{yelp_api_key}} ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.yelp.com/v3/businesses/search?location={{location}}&open_now=true&price=1",
+							"protocol": "https",
+							"host": [
+								"api",
+								"yelp",
+								"com"
+							],
+							"path": [
+								"v3",
+								"businesses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "location",
+									"value": "{{location}}"
+								},
+								{
+									"key": "open_now",
+									"value": "true"
+								},
+								{
+									"key": "price",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Open Businesses sorted by Ratings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{yelp_api_key}}"
+							}
+						],
+						"url": {
+							"raw": "https://api.yelp.com/v3/businesses/search?location={{location}}&open_now=true&price=1&sort_by=rating",
+							"protocol": "https",
+							"host": [
+								"api",
+								"yelp",
+								"com"
+							],
+							"path": [
+								"v3",
+								"businesses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "location",
+									"value": "{{location}}"
+								},
+								{
+									"key": "open_now",
+									"value": "true"
+								},
+								{
+									"key": "price",
+									"value": "1"
+								},
+								{
+									"key": "sort_by",
+									"value": "rating"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Open Businesses sorted by Distance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{yelp_api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://api.yelp.com/v3/businesses/search?location=union square&open_now=true&sort_by=distance",
+							"protocol": "https",
+							"host": [
+								"api",
+								"yelp",
+								"com"
+							],
+							"path": [
+								"v3",
+								"businesses",
+								"search"
+							],
+							"query": [
+								{
+									"key": "location",
+									"value": "union square"
+								},
+								{
+									"key": "open_now",
+									"value": "true"
+								},
+								{
+									"key": "sort_by",
+									"value": "distance"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Businesses Search",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{yelp_api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.yelp.com/v3/businesses/search?term=cafe&location=union square&attributes=hot_and_new",
+					"protocol": "https",
+					"host": [
+						"api",
+						"yelp",
+						"com"
+					],
+					"path": [
+						"v3",
+						"businesses",
+						"search"
+					],
+					"query": [
+						{
+							"key": "term",
+							"value": "cafe"
+						},
+						{
+							"key": "location",
+							"value": "union square"
+						},
+						{
+							"key": "attributes",
+							"value": "hot_and_new"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "location",
+			"value": "sunnyvale"
+		}
+	]
+}

@@ -66,6 +66,8 @@ function addStartMarker(map, spot) {
         infowindow.open(map, marker);
         event.stopPropagation();
     });
+    
+    return infowindow;
 }
 
 function addBusinessMarker(map, spot) {

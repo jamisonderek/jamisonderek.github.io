@@ -35,7 +35,7 @@ function closeAllInfoWindows() {
     }
 }
 
-function addMarker(map, spot) {
+function addBusinessMarker(map, spot) {
     // Add a marker.
     const location = { lat: spot.lat, lng: spot.long };
     const titleString = spot.name;
@@ -83,7 +83,6 @@ function addMarker(map, spot) {
 
 function initMap() {
     const response = window.getResponse();
-    console.log('initMap got response: '+response);
 
     // Center the map around the starting point.
     const centerMapSpot = getMapCenterGeo(response);
@@ -95,8 +94,7 @@ function initMap() {
 
     for (var i=0; i<response.length; i++) {
         for (var j=0; j<response[i].nearby.length; j++) {
-            console.log('adding marker ['+i+','+j+']: '+ response[i].nearby[j]);
-            infowindows.push(addMarker(map, response[i].nearby[j]));
+            infowindows.push(addBusinessMarker(map, response[i].nearby[j]));
         }
     }
     

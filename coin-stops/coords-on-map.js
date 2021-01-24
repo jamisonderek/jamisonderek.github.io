@@ -45,8 +45,8 @@ function addStartMarker(map, spot) {
     
     const contentString = `
         <div id=content width="500px" height="300px">
-           <div style="font-size: 2.4rem;">${spot.name}</div>
-           <div style="foreground-color: ${color}; background-color: ${color}">............</div>
+           <div style="font-size: 2.4rem;">${titleString}</div>
+           <div style="foreground-color: ${color}; background-color: ${color};" width="100%">.</div>
            <div>${mode}  ${headsign}</div>
            <div>${transportName}</div>
         </div>`;

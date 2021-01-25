@@ -1,5 +1,3 @@
-console.log('This is the coords-on-map.js file.');
-
 // There is a limit on mock server calls, so just host the coinstop images on github.com.
 const icons = [
     'https://jamisonderek.github.io/coin-stops/0-coins.png',
@@ -131,7 +129,6 @@ function addBusinessMarker(map, spot) {
 
 function initMap() {
     const response = window.getResponse();
-    console.log(`response in initMap is ${JSON.stringify(response)}`);
 
     // Center the map around the starting point.
     const centerMapSpot = getMapCenterGeo(response);

@@ -89,9 +89,7 @@ function addBusinessMarker(map, spot) {
     const transactions = (spot.transactions == undefined) ? '' : spot.transactions.join(',');
     
     const hours = spot.hours.join('<br/>');
-    
-    // NOTE: yelp.com br
-    
+     
     const contentString = `
     <div id=content width="500px" height="300px">
         <img src="${spot.image}" height="150px"/><br/>

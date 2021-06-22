@@ -15,9 +15,10 @@ pm.visualizer.set(
                 <td>{{coins}} Yelp dollar signs</td>
                 <td>{{categories}}</td>
                 <td>{{transactions}}</td>
+                <td>{{hours}}</td>
                 <td><img src={{image}} width="100" height="100" display="inline"></img></td>
                 <td>{{address}}</td>
-                <td>{{lat}},{{long}}</td>
+                <td>{{lat}}, {{long}}</td>
                 <td>{{distance}} meters</td>
                 <td>{{link}}</td>
             </tr>
